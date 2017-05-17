@@ -1,0 +1,43 @@
+{
+  "name": "AE08-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "description": "frontend",
+  "author": {
+    "name": "Marcel Mundl",
+    "email": "Marcel@Mundlhome.de"
+  },
+  "contributors": [
+    {
+      "name": "Marcel Mundl",
+      "email": "Marcel@Mundlhome.de"
+    },
+    {
+      "name": "Simon Jung"
+    }
+  ],
+  "dependencies": {
+    "@angular/common": "^4.1.2",
+    "@angular/compiler": "^4.1.2",
+    "@angular/core": "^4.1.2",
+    "@angular/forms": "^4.1.2",
+    "@angular/http": "^4.1.2",
+    "@angular/platform-browser": "^4.1.2",
+    "@angular/platform-browser-dynamic": "^4.1.2",
+    "@angular/router": "^4.1.2",
+    "angular-in-memory-web-api": "^0.3.2",
+    "core-js": "^2.4.1",
+    "rxjs": "^5.4.0",
+    "systemjs": "^0.20.12",
+    "zone.js": "^0.8.10"
+  },
+  "devDependencies": {
+    "@types/gulp": "^4.0.2",
+    "@types/node": "^7.0.18",
+    "gulp": "^3.9.1",
+    "gulp-task-loader": "git+https://github.com/Haringat/gulp-task-loader.git",
+    "gulp-typescript": "^3.1.6",
+    "typescript": "^2.3.2"
+  }
+}
