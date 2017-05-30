@@ -1,0 +1,22 @@
+x-cts-contact-list {
+  &.table-style {
+    display: table;
+    > div {
+      display: table-row;
+      > span {
+        display: table-cell;
+      }
+    }
+  }
+
+  &.list-style {
+    display: block;
+    > div {
+      display: list-item;
+      > span {
+        display: inline;
+      }
+    }
+  }
+
+}

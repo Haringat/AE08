@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "lib": ["es5", "es2015.promise", "es2015.generator", "es2015.iterable", "es2015.core", "es2015.symbol", "es2015.symbol.wellknown", "dom"],
+    "outDir": "dist"
+  },
+  "exclude": [
+    "node_modules",
+    "frontend"
+  ]
+}

@@ -1,2 +1,6 @@
 node_modules
 .idea
+*.js
+*.d.ts
+*.map
+*.css
