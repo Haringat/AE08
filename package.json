@@ -1,9 +1,10 @@
 {
-  "name": "AE08-frontend",
+  "name": "AE08",
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
-  "description": "frontend",
+  "description": "Something I wrote because I need a good grade",
+  "main": "lib/main.js",
   "author": {
     "name": "Marcel Mundl",
     "email": "Marcel@Mundlhome.de"
@@ -28,16 +29,28 @@
     "@angular/router": "^4.1.2",
     "angular-in-memory-web-api": "^0.3.2",
     "core-js": "^2.4.1",
+    "electron": "^1.6.7",
     "rxjs": "^5.4.0",
     "systemjs": "^0.20.12",
+    "systemjs-plugin-babel": "0.0.21",
+    "systemjs-plugin-traceur": "0.0.3",
     "zone.js": "^0.8.10"
   },
   "devDependencies": {
     "@types/gulp": "^4.0.2",
     "@types/node": "^7.0.18",
+    "@types/systemjs": "^0.20.2",
     "gulp": "^3.9.1",
     "gulp-task-loader": "git+https://github.com/Haringat/gulp-task-loader.git",
     "gulp-typescript": "^3.1.6",
+    "pg-promise": "^5.7.0",
+    "reflect-metadata": "^0.1.10",
     "typescript": "^2.3.2"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build": "tsc && tsc -p frontend",
+    "postinstall": "npm run-script build",
+    "prestart": "npm run-script build"
   }
 }
