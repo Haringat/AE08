@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit, AfterViewChecked} from "@angular/core";
-import ContactProvider, {IContactProvider, IContact} from "../../services/contactProvider/contactProvider.service";
+import ContactProvider, {IContactProvider, IContact} from "../../services/contactsManager.service";
 
 @Component({
     selector: "x-cts-contact-list",
