@@ -3,13 +3,14 @@ import ContactProvider, {IContactProvider, IContact} from "../../services/contac
 
 @Component({
     selector: "x-cts-contact-list",
-    styleUrls: ["app/components/contactList/contactList.style.css"],
-    templateUrl: "app/components/contactList/contactList.view.html"
+    styleUrls: ["src/contacts/components/contactList/contactList.style.css"],
+    templateUrl: "src/contacts/components/contactList/contactList.view.html"
 })
-export default class ContactList implements OnInit, AfterViewChecked {
+export default class ContactList implements OnInit {
 
     public contacts: Array<IContact> = [];
-    public mode: HTMLSelectElement;
+    public view: string = "table";
+    public JSON: typeof JSON = JSON;
 
     private _contactProvider: IContactProvider;
 
@@ -21,14 +22,5 @@ export default class ContactList implements OnInit, AfterViewChecked {
         this.contacts = this._contactProvider.getContacts();
     }
 
-    ngAfterViewChecked() {
-        console.log(this.mode);
-    }
-
-    stringify(any: any) {
-        return "{\n" + Object.getOwnPropertyNames(Object.getPrototypeOf(any)).map((name) => {
-            return `    ${name}: ${Object.getPrototypeOf(any)[name]},\n`;
-        }) + "}\n";
-    }
 
 }

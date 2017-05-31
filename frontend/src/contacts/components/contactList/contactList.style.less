@@ -1,0 +1,64 @@
+@import "../../../colors";
+
+.view-selector {
+  border: none;
+  outline: none;
+  background: none;
+  height: 50px;
+  &::choices {
+    display: none;
+  }
+  > option {
+    border: none;
+    outline: none;
+    padding: 5px;
+    height: 50px;
+    &:first-child {
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    &:last-child {
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+  }
+}
+
+.contact-list {
+  margin-top: 30px;
+}
+
+.table-view {
+  padding-left: 0;
+  border-spacing: 0;
+  border-collapse: collapse;
+  td {
+    border: 1px solid @border-color-weak;
+  }
+  > ul {
+    display: table-row-group;
+    > div {
+      display: table-row;
+      border-spacing: 0;
+      > span {
+        display: table-cell;
+        padding: 2px;
+        border: 1px solid @border-color-weak;
+      }
+    }
+  }
+}
+
+.list-view {
+  display: block;
+  > ul {
+    margin: 0;
+    padding-left: 20px;
+    > div {
+      display: list-item;
+      > span {
+        display: inline;
+      }
+    }
+  }
+}

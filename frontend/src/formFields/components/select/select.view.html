@@ -1,0 +1,11 @@
+<select class="hidden-input" [value]="selectedValue" (change)="selectedValue = $event.target.value">
+    <option *ngFor="let option of model" [value]="option.modelValue">{{option.displayValue}}</option>
+</select>
+<!--div class="styled-input" [class.empty]="model.length === 0" (click)="expanded = true">
+    <span class="current-value" *ngIf="selectedValue">{{getFullValue(selectedValue)}}</span>
+    <span class="placeholder" *ngIf="!selectedValue && model.length">{{placeholder}}</span>
+    <div class="options" *ngIf="expanded">
+        <div class="option">Kein Wert vorhanden</div>
+        <div class="option" *ngIf="model.length" *ngFor="let option of model" (change)="selectedValue = option.modelValue">{{option.displayValue}}</div>
+    </div>
+</div-->

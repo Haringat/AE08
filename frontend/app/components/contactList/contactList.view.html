@@ -1,7 +1,0 @@
-<select #mode>
-    <option value="list">Listenansicht</option>
-</select>
-<pre>{{stringify(mode)}}</pre>
-<div *ngFor="let contact of contacts">
-    <span>{{contact.firstName}}</span> <span>{{contact.lastName}}</span>: <span>{{contact.phone}}</span>
-</div>

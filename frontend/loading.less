@@ -1,0 +1,159 @@
+@keyframes loading-dot-1-5 {
+  0% {
+      opacity: 0;
+  }
+  10% {
+      opacity: 1;
+  }
+  50% {
+      opacity: 1;
+  }
+  60% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+@keyframes loading-dot-2-5 {
+  0% {
+      opacity: 0;
+  }
+  10% {
+      opacity: 0;
+  }
+  20% {
+      opacity: 1;
+  }
+  60% {
+      opacity: 1;
+  }
+  70% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+@keyframes loading-dot-3-5 {
+  0% {
+      opacity: 0;
+  }
+  20% {
+      opacity: 0;
+  }
+  30% {
+      opacity: 1;
+  }
+  70% {
+      opacity: 1;
+  }
+  80% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+@keyframes loading-dot-4-5 {
+  0% {
+      opacity: 0;
+  }
+  30% {
+      opacity: 0;
+  }
+  40% {
+      opacity: 1;
+  }
+  80% {
+      opacity: 1;
+  }
+  90% {
+      opacity: 0;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+@keyframes loading-dot-5-5 {
+  0% {
+      opacity: 0;
+  }
+  40% {
+      opacity: 0;
+  }
+  50% {
+      opacity: 1;
+  }
+  90% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+  }
+}
+
+@color: rgba(0, 0, 0, .5);
+
+body {
+  background-color: rgba(0, 0, 0, .05);
+}
+
+.loading-note {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-block;
+  color: @color;
+  font-family: sans;
+}
+
+.bailout-error {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: red;
+  display: inline-block;
+  max-width: 50%;
+  max-height: 100%;
+  position: absolute;
+  font-family: monospace;
+}
+
+.loading-dots {
+  > div:nth-child(1) {
+    animation-name: loading-dot-1-5;
+  }
+  > div:nth-child(2) {
+    animation-name: loading-dot-2-5;
+  }
+  > div:nth-child(3) {
+    animation-name: loading-dot-3-5;
+  }
+  > div:nth-child(4) {
+    animation-name: loading-dot-4-5;
+  }
+  > div:nth-child(5) {
+    animation-name: loading-dot-5-5;
+  }
+
+  position: absolute;
+  top: 55%;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+
+  > div {
+    animation-delay: 0s;
+    animation-duration: 10s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    border-radius: 50%;
+    padding: 5px;
+    margin: 10px;
+    background-color: @color;
+    display: inline-block;
+    //transition-property: opacity;
+  }
+}

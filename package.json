@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "description": "Something I wrote because I need a good grade",
-  "main": "lib/main.js",
+  "main": "dist/main.js",
   "author": {
     "name": "Marcel Mundl",
     "email": "Marcel@Mundlhome.de"

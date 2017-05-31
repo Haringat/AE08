@@ -39,7 +39,7 @@ export default async function readConfig(attempt: number = 1) {
         configFileContent = await readFile(configPath);
     } catch (e) {
         const error: NodeJS.ErrnoException = e;
-        switch (error.errno) {
+        switch (-error.errno) {
             case ENOENT:
                 console.log("info: config file does not exist. Creating it...");
                 return await createConfigFile();
@@ -66,7 +66,7 @@ export default async function readConfig(attempt: number = 1) {
 
 async function createConfigFile(attempt: number = 1) {
     try {
-        await writeFile(configPath, defaultConfig);
+        await writeFile(configPath, JSON.stringify(defaultConfig));
     } catch (e) {
         const error: NodeJS.ErrnoException = e;
         switch (error.errno) {

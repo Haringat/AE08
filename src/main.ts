@@ -14,9 +14,13 @@ let primaryDisplay;
 
 (async () => {
     app.on("ready", async () => {
-        primaryDisplay = electron.screen.getPrimaryDisplay();
-        await init();
-    })
+        try {
+            primaryDisplay = electron.screen.getPrimaryDisplay();
+            await init();
+        } catch (e) {
+            console.log(e);
+        }
+    });
 })();
 
 async function init() {
