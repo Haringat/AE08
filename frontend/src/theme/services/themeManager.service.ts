@@ -34,12 +34,17 @@ export default class ThemeManager implements IThemeManager{
         let primary = new Color(primaryColor);
         switch (type) {
             case ThemeType.MONOCHROMATIC:
-                this.harmonyColors = [
-                    primary.
-                ]
+                for (let i = 0; i <= 10; i++) {
+                    let harmonyColor = primary.clone();
+                    harmonyColor.key = i * 10;
+                    this.harmonyColors.push(harmonyColor);
+                }
                 break;
             case ThemeType.ANALOGOUS:
-                primary
+                this.harmonyColors.push(primary);
+                this.harmonyColors.push(primary.clone().rotate(30));
+                this.harmonyColors.push(primary.clone().rotate(-30));
+                break;
         }
     }
 

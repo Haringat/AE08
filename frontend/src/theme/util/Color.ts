@@ -1,4 +1,4 @@
-import Vector2D, {degToRad} from "./Vector2D";
+import Vector2D, {degToRad, IVector2D} from "./Vector2D";
 
 //language=RegExp
 const NUM_0_255 = "\s*(?:[0-1]?[0-9]{1,2}|2(?:[0-4][0-9]|5[0-5]))\s*";
@@ -9,8 +9,8 @@ const PERCENT = "\s*(?:[0-9]{1,2}|100)%\s*";
 //language=RegExp
 const FLOAT_0_1 = "\s*(?:0|0?\.\d+|1(?:\.0+))\s*";
 
-const REGEX_RGBA_HEX_NON_CAP = /^[0-9a-f]{8}$/i;
-const REGEX_RGB_HEX_NON_CAP = /^[0-9a-f]{6}$/i;
+const REGEX_RGBA_HEX_NON_CAP = /^#[0-9a-f]{8}$/i;
+const REGEX_RGB_HEX_NON_CAP = /^#[0-9a-f]{6}$/i;
 //language=RegExp
 const REGEX_RGB_FUNC_NON_CAP = new RegExp(`^\s*rgb\((?:${NUM_0_255}|${PERCENT})(?:,(?:${NUM_0_255}|${PERCENT})){2}\)\s*;?\s*$`, "i");
 //language=RegExp
@@ -20,8 +20,8 @@ const REGEX_HSL_FUNC_NON_CAP = new RegExp(`^\s*hsl\(${NUM_0_360},${PERCENT},${PE
 //language=RegExp
 const REGEX_HSLA_FUNC_NON_CAP = new RegExp(`^\s*hsla\(${NUM_0_255}(?:,${NUM_0_255}){2},${FLOAT_0_1}\)\s*;?\s*$`, "i");
 
-const REGEX_RGBA_HEX = /^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
-const REGEX_RGB_HEX = /^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
+const REGEX_RGBA_HEX = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
+const REGEX_RGB_HEX = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 //language=RegExp
 const REGEX_RGB_FUNC = new RegExp(`^\s*rgb\((${NUM_0_255}),(${NUM_0_255}),(${NUM_0_255})\)\s*;?\s*$`, "i");
 //language=RegExp
@@ -30,6 +30,10 @@ const REGEX_RGBA_FUNC = new RegExp(`^\s*rgba\((${NUM_0_255}),(${NUM_0_255}),(${N
 const REGEX_HSL_FUNC = new RegExp(`^\s*hsl\((${NUM_0_360}),(${PERCENT}),(${PERCENT})\)\s*;?\s*$`, "i");
 //language=RegExp
 const REGEX_HSLA_FUNC = new RegExp(`^\s*hsla\((${NUM_0_255}), (${NUM_0_255}), (${NUM_0_255}),(${FLOAT_0_1})\)\s*;?\s*$`, "i");
+
+function vectorToRGB(vector: IVector2D) {
+
+}
 
 export interface IColor {
     red: number;
@@ -130,7 +134,7 @@ export default class Color implements IColor {
     }
 
     public get key() {
-        
+        return (255 - Math.min(this._red, this._blue, this._green) * 100 / 255);
     }
 
     public set saturation(saturation: number) {
@@ -144,18 +148,26 @@ export default class Color implements IColor {
     }
 
     public set hue(degrees: number) {
-        let colorVector = new Vector2D()
+        let colorVector = new Vector2D(this._red, 0).add(new Vector2D(this._green, 0).rotate(120)).add(new Vector2D(this._blue, 0).rotate(240));
+        colorVector.rotate(degrees);
+
     }
 
     public get hue() {
-        return
+        let colorVector = new Vector2D(this._red, 0).add(new Vector2D(this._green, 0).rotate(120)).add(new Vector2D(this._blue, 0).rotate(240));
+        return Vector2D.angleBetweenVectors(new Vector2D(1,0), colorVector);
     }
 
     public constructor(red: number, green: number, blue: number, alpha?: number);
     public constructor(color: string);
     public constructor(red: number | string, green?: number, blue?: number, alpha: number = 1) {
         if (typeof red === "string") {
-
+            this._parseColorString(red);
+        } else {
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.alpha = alpha;
         }
     }
 
@@ -163,9 +175,14 @@ export default class Color implements IColor {
         let colorVector = new Vector2D(saturation, 0).rotate(hue);
         let angleToGreen = degToRad(Vector2D.angleBetweenVectors(colorVector, new Vector2D(1,0).rotate(120)));
         let angleToBlue = degToRad(Vector2D.angleBetweenVectors(colorVector, new Vector2D(1,0).rotate(240)));
-
-
-        let relativeLight = 100 / light;
+        let red = Math.cos(degToRad(hue)) * colorVector.length;
+        let green = Math.cos(angleToGreen) * colorVector.length;
+        let blue = Math.cos(angleToBlue) * colorVector.length;
+        let relativeLight = light / 100;
+        red *= relativeLight;
+        green *= relativeLight;
+        blue *= relativeLight;
+        return new Color(red, green, blue);
     }
 
     public static fromCMYK(cyan: number, magenta: number, yellow: number, key: number) {

@@ -42,7 +42,7 @@ export default class Vector2D implements IVector2D {
     }
 
     public rotate(degrees: number) {
-        let alpha = Math.acos(this.x) + (degrees / 180 * Math.PI);
+        let alpha = Math.acos(this.x / this.length) + (degrees / 180 * Math.PI);
         let length = this.length;
         this.x = Math.cos(alpha) * length;
         this.y = Math.sin(alpha) * length;
