@@ -10,7 +10,7 @@ export interface IVector2D {
     cross(other: IVector2D): number;
 
     multiply(scalar: number): IVector2D;
-    multiply(vector: IVector2D): IVector2D;
+    multiply(vector: IVector2D): number;
 }
 
 export function degToRad(degrees: number) {
@@ -71,12 +71,13 @@ export default class Vector2D implements IVector2D {
         return this.x * other.y - this.y * other.x;
     }
 
-    public multiply(scalar: number);
-    public multiply(vector: IVector2D);
-    public multiply(other: number | IVector2D) {
+    public multiply(scalar: number): IVector2D;
+    public multiply(vector: IVector2D): number;
+    public multiply(other: number | IVector2D): IVector2D | number {
         if (typeof other === "number") {
             this.x *= other;
             this.y *= other;
+            return this;
         } else if (typeof other === "object" && other.hasOwnProperty("x") && other.hasOwnProperty("y")) {
             return this.x * other.x + this.y * other.y;
         }

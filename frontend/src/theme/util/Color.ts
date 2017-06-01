@@ -1,35 +1,33 @@
 import Vector2D, {degToRad, IVector2D} from "./Vector2D";
 
 //language=RegExp
-const NUM_0_255 = "\s*(?:[0-1]?[0-9]{1,2}|2(?:[0-4][0-9]|5[0-5]))\s*";
+const NUM_0_255 = "\\s*(?:[0-1]?\\d{1,2}|2(?:[0-4]\\d|5[0-5]))\\s*";
 //language=RegExp
-const NUM_0_360 = "\s*(?:[0-2]?[0-9]{1,2}|3(?:[0-5][0-9]|60))\s*";
+const NUM_0_360 = "\\s*(?:[0-2]?\\d{1,2}|3(?:[0-5]\\d|60))\\s*";
 //language=RegExp
-const PERCENT = "\s*(?:[0-9]{1,2}|100)%\s*";
+const PERCENT = "\\s*(?:0{0,2}\\d|0?\\d{2}|100)%\\s*";
 //language=RegExp
-const FLOAT_0_1 = "\s*(?:0|0?\.\d+|1(?:\.0+))\s*";
+const FLOAT_0_1 = "\\s*(?:0|0?\.\\d+|1(?:\.0+))\\s*";
 
-const REGEX_RGBA_HEX_NON_CAP = /^#[0-9a-f]{8}$/i;
 const REGEX_RGB_HEX_NON_CAP = /^#[0-9a-f]{6}$/i;
 //language=RegExp
-const REGEX_RGB_FUNC_NON_CAP = new RegExp(`^\s*rgb\((?:${NUM_0_255}|${PERCENT})(?:,(?:${NUM_0_255}|${PERCENT})){2}\)\s*;?\s*$`, "i");
+const REGEX_RGB_FUNC_NON_CAP = new RegExp(`^\\s*rgb\\((?:${NUM_0_255}|${PERCENT})(?:,(?:${NUM_0_255}|${PERCENT})){2}\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_RGBA_FUNC_NON_CAP = new RegExp(`^\s*rgba\((?:${NUM_0_255}|${PERCENT})(?:,(?:${NUM_0_255}|${PERCENT})){2},(?:${FLOAT_0_1}|${PERCENT})\)\s*;?\s*$`, "i");
+const REGEX_RGBA_FUNC_NON_CAP = new RegExp(`^\\s*rgba\\((?:${NUM_0_255}|${PERCENT})(?:,(?:${NUM_0_255}|${PERCENT})){2},(?:${FLOAT_0_1}|${PERCENT})\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_HSL_FUNC_NON_CAP = new RegExp(`^\s*hsl\(${NUM_0_360},${PERCENT},${PERCENT}\)\s*;?\s*$`, "i");
+const REGEX_HSL_FUNC_NON_CAP = new RegExp(`^\\s*hsl\\(${NUM_0_360},${PERCENT},${PERCENT}\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_HSLA_FUNC_NON_CAP = new RegExp(`^\s*hsla\(${NUM_0_255}(?:,${NUM_0_255}){2},${FLOAT_0_1}\)\s*;?\s*$`, "i");
+const REGEX_HSLA_FUNC_NON_CAP = new RegExp(`^\\s*hsla\\(${NUM_0_255}(?:,${NUM_0_255}){2},${FLOAT_0_1}\\)\\s*;?\\s*$`, "i");
 
-const REGEX_RGBA_HEX = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 const REGEX_RGB_HEX = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 //language=RegExp
-const REGEX_RGB_FUNC = new RegExp(`^\s*rgb\((${NUM_0_255}),(${NUM_0_255}),(${NUM_0_255})\)\s*;?\s*$`, "i");
+const REGEX_RGB_FUNC = new RegExp(`^\\s*rgb\\((${NUM_0_255}|${PERCENT}),(${NUM_0_255}|${PERCENT}),(${NUM_0_255}|${PERCENT})\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_RGBA_FUNC = new RegExp(`^\s*rgba\((${NUM_0_255}),(${NUM_0_255}),(${NUM_0_255}),(${FLOAT_0_1})\)\s*;?\s*$`, "i");
+const REGEX_RGBA_FUNC = new RegExp(`^\\s*rgba\\((${NUM_0_255}|${PERCENT}),(${NUM_0_255}|${PERCENT}),(${NUM_0_255}|${PERCENT}),(${FLOAT_0_1}|${PERCENT})\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_HSL_FUNC = new RegExp(`^\s*hsl\((${NUM_0_360}),(${PERCENT}),(${PERCENT})\)\s*;?\s*$`, "i");
+const REGEX_HSL_FUNC = new RegExp(`^\\s*hsl\\((${NUM_0_360}),(${PERCENT}),(${PERCENT})\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_HSLA_FUNC = new RegExp(`^\s*hsla\((${NUM_0_255}), (${NUM_0_255}), (${NUM_0_255}),(${FLOAT_0_1})\)\s*;?\s*$`, "i");
+const REGEX_HSLA_FUNC = new RegExp(`^\\s*hsla\\((${NUM_0_360}), (${PERCENT}), (${PERCENT}),(${FLOAT_0_1})\\)\\s*;?\\s*$`, "i");
 
 function vectorToRGB(vector: IVector2D) {
 
@@ -56,10 +54,10 @@ export default class Color implements IColor {
     private _alpha: number;
 
     public set red(red: number) {
-        if (red < 0 || red > 255 || red % 1 !== 0) {
-            throw new Error("the red channel of a color must be an integer between 0 and 255 (inclusive)");
+        if (red < 0 || red > 255) {
+            throw new Error("the red channel of a color must be a number between 0 and 255 (inclusive)");
         } else {
-            this._red = red;
+            this._red = red | 0;
         }
     }
 
@@ -68,10 +66,10 @@ export default class Color implements IColor {
     }
 
     public set green(green: number) {
-        if (green < 0 || green > 255 || green % 1 !== 0) {
-            throw new Error("the green channel of a color must be an integer between 0 and 255 (inclusive)");
+        if (green < 0 || green > 255) {
+            throw new Error("the green channel of a color must be a number between 0 and 255 (inclusive)");
         } else {
-            this._green = green;
+            this._green = green | 0;
         }
     }
 
@@ -80,10 +78,10 @@ export default class Color implements IColor {
     }
 
     public set blue(blue: number) {
-        if (blue < 0 || blue > 255 || blue % 1 !== 0) {
-            throw new Error("the blue channel of a color must be an integer between 0 and 255 (inclusive)");
+        if (blue < 0 || blue > 255) {
+            throw new Error("the blue channel of a color must be a number between 0 and 255 (inclusive)");
         } else {
-            this._blue = blue;
+            this._blue = blue | 0;
         }
     }
 
@@ -224,33 +222,36 @@ export default class Color implements IColor {
     }
 
     private _parseColorString(colorString: string) {
-        if (REGEX_RGBA_HEX_NON_CAP.test(colorString)) {
-            let matches = colorString.match(REGEX_RGBA_HEX);
-            this._red = hexToDec(matches[1]);
-            this._green = hexToDec(matches[2]);
-            this._blue = hexToDec(matches[3]);
-            this._alpha = hexToDec(matches[4]);
-        } else if (REGEX_RGB_HEX_NON_CAP.test(colorString)) {
+        if (REGEX_RGB_HEX_NON_CAP.test(colorString)) {
             let matches = colorString.match(REGEX_RGB_HEX);
             this._red = hexToDec(matches[1]);
             this._green = hexToDec(matches[2]);
             this._blue = hexToDec(matches[3]);
             this._alpha = 1;
-        } else if (REGEX_RGBA_FUNC_NON_CAP.test(colorString)) {
-            let matches = colorString.match(REGEX_RGBA_FUNC);
-            this._red = matches[1].includes("%") ? (parseInt(matches[1]) * 255) | 0 : parseInt(matches[1]);
-            this._green = matches[2].includes("%") ? (parseInt(matches[2]) * 255) | 0 : parseInt(matches[2]);
-            this._blue = matches[3].includes("%") ? (parseInt(matches[3]) * 255) | 0 : parseInt(matches[3]);
-            this._alpha = matches[4].includes("%") ? (parseInt(matches[4]) * 255) | 0 : parseInt(matches[4]);
         } else if (REGEX_RGB_FUNC_NON_CAP.test(colorString)) {
             let matches = colorString.match(REGEX_RGB_FUNC);
-            this._red = matches[1].includes("%") ? (parseInt(matches[1]) * 255) | 0 : parseInt(matches[1]);
-            this._green = matches[2].includes("%") ? (parseInt(matches[2]) * 255) | 0 : parseInt(matches[2]);
-            this._blue = matches[3].includes("%") ? (parseInt(matches[3]) * 255) | 0 : parseInt(matches[3]);
+            this._red = matches[1].includes("%") ? (parseInt(matches[1]) / 100 * 255) | 0 : parseInt(matches[1]);
+            this._green = matches[2].includes("%") ? (parseInt(matches[2]) / 100 * 255) | 0 : parseInt(matches[2]);
+            this._blue = matches[3].includes("%") ? (parseInt(matches[3]) / 100 * 255) | 0 : parseInt(matches[3]);
             this._alpha = 1;
+        } else if (REGEX_RGBA_FUNC_NON_CAP.test(colorString)) {
+            let matches = colorString.match(REGEX_RGBA_FUNC);
+            this._red = matches[1].includes("%") ? (parseInt(matches[1]) / 100 * 255) | 0 : parseInt(matches[1]);
+            this._green = matches[2].includes("%") ? (parseInt(matches[2]) / 100 * 255) | 0 : parseInt(matches[2]);
+            this._blue = matches[3].includes("%") ? (parseInt(matches[3]) / 100 * 255) | 0 : parseInt(matches[3]);
+            this._alpha = matches[4].includes("%") ? parseFloat(matches[4]) : parseFloat(matches[4]);
         } else if (REGEX_HSL_FUNC_NON_CAP.test(colorString)) {
             let matches = colorString.match(REGEX_HSL_FUNC);
-            // TODO: complete hsl parsing and make cmyk parsing
+            const c = Color.fromHSLA(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), 1);
+            this.red = c.red;
+            this.green = c.green;
+            this.blue = c.blue;
+        } else if (REGEX_HSLA_FUNC_NON_CAP.test(colorString)) {
+            let matches = colorString.match(REGEX_HSLA_FUNC);
+            const c = Color.fromHSLA(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), parseFloat(matches[4]));
+            this.red = c.red;
+            this.green = c.green;
+            this.blue = c.blue;
         } else {
             throw new Error(`string "${colorString}" is not a known color format.`);
         }
