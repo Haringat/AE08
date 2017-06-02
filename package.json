@@ -30,11 +30,12 @@
     "@angular/router": "^4.1.2",
     "angular-in-memory-web-api": "^0.3.2",
     "core-js": "^2.4.1",
-    "electron": "^1.6.7",
+    "electron": "^1.7.2",
     "rxjs": "^5.4.0",
     "systemjs": "^0.20.12",
     "systemjs-plugin-babel": "0.0.21",
     "systemjs-plugin-traceur": "0.0.3",
+    "tslib": "^1.7.1",
     "zone.js": "^0.8.10"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import Vector2D, {degToRad, IVector2D} from "./Vector2D";
+import Vector2D, {angleBetweenVectors, degToRad, toPrecision} from "./Vector2D";
 
 //language=RegExp
 const NUM_0_255 = "\\s*(?:[0-1]?\\d{1,2}|2(?:[0-4]\\d|5[0-5]))\\s*";
@@ -17,7 +17,9 @@ const REGEX_RGBA_FUNC_NON_CAP = new RegExp(`^\\s*rgba\\((?:${NUM_0_255}|${PERCEN
 //language=RegExp
 const REGEX_HSL_FUNC_NON_CAP = new RegExp(`^\\s*hsl\\(${NUM_0_360},${PERCENT},${PERCENT}\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_HSLA_FUNC_NON_CAP = new RegExp(`^\\s*hsla\\(${NUM_0_255}(?:,${NUM_0_255}){2},${FLOAT_0_1}\\)\\s*;?\\s*$`, "i");
+const REGEX_HSLA_FUNC_NON_CAP = new RegExp(`^\\s*hsla\\(${NUM_0_360}(?:,${PERCENT}){2},(?:${FLOAT_0_1}|${PERCENT})\\)\\s*;?\\s*$`, "i");
+//language=RegExp
+const REGEX_CMYK_FUNC_NON_CAP = new RegExp(`^\\s*cmyk\\(${PERCENT}(?:,${PERCENT}){3}\\)\\s*;?\\s*$`, "i");
 
 const REGEX_RGB_HEX = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i;
 //language=RegExp
@@ -27,11 +29,15 @@ const REGEX_RGBA_FUNC = new RegExp(`^\\s*rgba\\((${NUM_0_255}|${PERCENT}),(${NUM
 //language=RegExp
 const REGEX_HSL_FUNC = new RegExp(`^\\s*hsl\\((${NUM_0_360}),(${PERCENT}),(${PERCENT})\\)\\s*;?\\s*$`, "i");
 //language=RegExp
-const REGEX_HSLA_FUNC = new RegExp(`^\\s*hsla\\((${NUM_0_360}), (${PERCENT}), (${PERCENT}),(${FLOAT_0_1})\\)\\s*;?\\s*$`, "i");
+const REGEX_HSLA_FUNC = new RegExp(`^\\s*hsla\\((${NUM_0_360}),(${PERCENT}),(${PERCENT}),(${FLOAT_0_1}|${PERCENT})\\)\\s*;?\\s*$`, "i");
+//language=RegExp
+const REGEX_CMYK_FUNC = new RegExp(`^\\s*cmyk\\((${PERCENT}),(${PERCENT}),(${PERCENT}),(${PERCENT})\\)\\s*;?\\s*$`, "i");
 
-function vectorToRGB(vector: IVector2D) {
-
-}
+const tan_60 = Math.tan(degToRad(60));
+const sin_60 = Math.sin(degToRad(60));
+const sin_120 = Math.sin(degToRad(120));
+const cos_120 = Math.cos(degToRad(120));
+const cos_240 = Math.cos(degToRad(240));
 
 export interface IColor {
     red: number;
@@ -132,28 +138,96 @@ export default class Color implements IColor {
     }
 
     public get key() {
-        return (255 - Math.min(this._red, this._blue, this._green) * 100 / 255);
+        return Math.min(this._red, this._blue, this._green) * 100 / 255;
     }
 
     public set saturation(saturation: number) {
         let oldSaturation = this.saturation;
+        let deltaSaturation = saturation - oldSaturation;
     }
 
     public get saturation() {
         let minColor = Math.min(this._red, this._green, this._blue);
         let maxColor = Math.max(this._red, this._green, this._blue);
-        return (maxColor - minColor) / 255 * 100;
+        return (maxColor - minColor) / 255 * 100 / (100 - Math.abs(2 * this.lightness - 100));
+    }
+
+    public set lightness(lightness: number) {
+        let oldLightness = this.lightness;
+        let relativeLightness = lightness / oldLightness;
+        this.red *= relativeLightness;
+        this.green *= relativeLightness;
+        this.blue *= relativeLightness;
+    }
+
+    public get lightness() {
+        let minColor = Math.min(this._red, this._green, this._blue);
+        let maxColor = Math.max(this._red, this._green, this._blue);
+        return (maxColor - minColor) / 255 / 2 * 100;
     }
 
     public set hue(degrees: number) {
-        let colorVector = new Vector2D(this._red, 0).add(new Vector2D(this._green, 0).rotate(120)).add(new Vector2D(this._blue, 0).rotate(240));
-        colorVector.rotate(degrees);
-
+        // save saturation and lightness to restore them later because during the transformation they are lost
+        let saturation = this.saturation;
+        let lightness = this.lightness;
+        let colorVector = new Vector2D(this._red, 0)
+            .add(new Vector2D(this._green, 0).rotate(120))
+            .add(new Vector2D(this._blue, 0).rotate(240))
+            .rotate(degrees);
+        const alpha = toPrecision(angleBetweenVectors(new Vector2D(1,0), colorVector), 10);
+        if (alpha >= 0 && alpha < 120) {
+            const green = new Vector2D(-colorVector.y / tan_60, colorVector.y);
+            this.green = green.length;
+            const red = colorVector.clone()
+                .subtract(green);
+            this.red = red.length;
+            this.blue = 0;
+        } else if (alpha >= 120 && alpha < 180) {
+            const green = new Vector2D(-colorVector.y / tan_60, colorVector.y);
+            this.green = green.length;
+            const blue = colorVector.clone()
+                .subtract(green);
+            this.green += blue.length;
+            this.blue = blue.length;
+            this.red = 0;
+        } else if (alpha > 180 && alpha < 240) {
+            const green = new Vector2D(colorVector.y / tan_60, colorVector.y);
+            this.green = green.length;
+            const blue = colorVector.clone()
+                .subtract(green);
+            this.blue = blue.length;
+            this.green += blue.length;
+            this.red = 0;
+        } else {
+            const blue = new Vector2D(colorVector.y / tan_60, colorVector.y);
+            this.blue = blue.length;
+            const red = colorVector.clone()
+                .subtract(blue);
+            this.red = red.length;
+            this.green = 0;
+        }
+        // restore the saved saturation and lightness values
+        this.saturation = saturation;
+        this.lightness = lightness;
+        /*const green = toPrecision(2 * colorVector.x * cos_120 - colorVector.y * cos_240 / sin_120, 10);
+        this.green = Math.min(green, 255);
+        const blue = toPrecision((colorVector.y - green * Math.sin(Math.acos(1) + degToRad(120))) / Math.sin(Math.acos(1) + degToRad(240)), 10);
+        this.blue = blue;*/
     }
 
     public get hue() {
-        let colorVector = new Vector2D(this._red, 0).add(new Vector2D(this._green, 0).rotate(120)).add(new Vector2D(this._blue, 0).rotate(240));
-        return Vector2D.angleBetweenVectors(new Vector2D(1,0), colorVector);
+        let red = new Vector2D(this._red, 0);
+        let green = new Vector2D(this._green, 0).rotate(120);
+        let blue = new Vector2D(this._blue, 0).rotate(240);
+        let colorVector = red.clone()
+            .add(green)
+            .add(blue);
+        let angle = angleBetweenVectors(new Vector2D(1,0), colorVector);
+        if (colorVector.y >= 0) {
+            return angle;
+        } else {
+            return 180 + angle;
+        }
     }
 
     public constructor(red: number, green: number, blue: number, alpha?: number);
@@ -170,17 +244,37 @@ export default class Color implements IColor {
     }
 
     public static fromHSLA(hue: number, saturation: number, light: number, alpha: number) {
-        let colorVector = new Vector2D(saturation, 0).rotate(hue);
-        let angleToGreen = degToRad(Vector2D.angleBetweenVectors(colorVector, new Vector2D(1,0).rotate(120)));
-        let angleToBlue = degToRad(Vector2D.angleBetweenVectors(colorVector, new Vector2D(1,0).rotate(240)));
-        let red = Math.cos(degToRad(hue)) * colorVector.length;
-        let green = Math.cos(angleToGreen) * colorVector.length;
-        let blue = Math.cos(angleToBlue) * colorVector.length;
-        let relativeLight = light / 100;
-        red *= relativeLight;
-        green *= relativeLight;
-        blue *= relativeLight;
-        return new Color(red, green, blue);
+        saturation /= 100;
+        light /= 100;
+        // formula taken from http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
+        const c = (1 - Math.abs(2 * light - 1)) * saturation;
+        const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+        const m = light - c / 2;
+        let rgb = {
+            red: 0,
+            green: 0,
+            blue: 0
+        };
+        if (hue >= 0 && hue < 60) {
+            rgb.red = c;
+            rgb.green = x;
+        } else if (hue >= 60 && hue < 120) {
+            rgb.red = x;
+            rgb.green = c;
+        } else if (hue >= 120 && hue < 180) {
+            rgb.green = c;
+            rgb.blue = x;
+        } else if (hue >= 180 && hue < 240) {
+            rgb.green = x;
+            rgb.blue = c;
+        } else if (hue >= 24 && hue < 300) {
+            rgb.red = x;
+            rgb.blue = c;
+        } else if (hue >= 300 && hue < 360) {
+            rgb.red = c;
+            rgb.blue = x;
+        }
+        return new Color((rgb.red + m) * 255, (rgb.green + m) * 255, (rgb.blue + m) * 255, 1);
     }
 
     public static fromCMYK(cyan: number, magenta: number, yellow: number, key: number) {
@@ -197,9 +291,9 @@ export default class Color implements IColor {
             throw new RangeError("cyan value must be between 0% and 100% inclusive");
         }
         let RGB = {
-            red: (255 - (255 * cyan / 100)),
-            green: 255 - (255 * magenta / 100),
-            blue: 255 - (255 * yellow / 100)
+            red: 255 * (100 - cyan) / 100,
+            green: 255 * (100 - magenta) / 100,
+            blue: 255 * (100 - yellow) / 100
         };
         RGB.red -= RGB.red * key / 100;
         RGB.green -= RGB.green * key / 100;
@@ -208,12 +302,13 @@ export default class Color implements IColor {
     }
 
     public rotate(degrees: number) {
-        let red = Vector2D.fromLengthAndRotation(this.red, degrees);
+        this.hue += degrees;
+        /*let red = Vector2D.fromLengthAndRotation(this.red, degrees);
         let green = Vector2D.fromLengthAndRotation(this.green, 120 + degrees);
         let blue = Vector2D.fromLengthAndRotation(this.blue, 240 + degrees);
         this.red = Math.cos(degToRad(degrees)) * red.length + Math.cos(degToRad(120 + degrees)) * green.length + Math.cos(degToRad(240 + degrees)) * blue.length;
         this.green = Math.cos(degToRad(120 - degrees)) * red.length + Math.cos(degToRad(degrees)) * green.length + Math.cos(degToRad(120 + degrees)) * blue.length;
-        this.red = Math.cos(degToRad(240 - degrees)) * red.length + Math.cos(degToRad(120 - degrees)) * green.length + Math.cos(degToRad(degrees)) * blue.length;
+        this.red = Math.cos(degToRad(240 - degrees)) * red.length + Math.cos(degToRad(120 - degrees)) * green.length + Math.cos(degToRad(degrees)) * blue.length;*/
         return this;
     }
 
@@ -239,19 +334,28 @@ export default class Color implements IColor {
             this._red = matches[1].includes("%") ? (parseInt(matches[1]) / 100 * 255) | 0 : parseInt(matches[1]);
             this._green = matches[2].includes("%") ? (parseInt(matches[2]) / 100 * 255) | 0 : parseInt(matches[2]);
             this._blue = matches[3].includes("%") ? (parseInt(matches[3]) / 100 * 255) | 0 : parseInt(matches[3]);
-            this._alpha = matches[4].includes("%") ? parseFloat(matches[4]) : parseFloat(matches[4]);
+            this._alpha = matches[4].includes("%") ? parseInt(matches[4]) / 100 : parseFloat(matches[4]);
         } else if (REGEX_HSL_FUNC_NON_CAP.test(colorString)) {
             let matches = colorString.match(REGEX_HSL_FUNC);
-            const c = Color.fromHSLA(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), 1);
+            const c = Color.fromHSLA(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), 0);
             this.red = c.red;
             this.green = c.green;
             this.blue = c.blue;
+            this.alpha = 1;
         } else if (REGEX_HSLA_FUNC_NON_CAP.test(colorString)) {
             let matches = colorString.match(REGEX_HSLA_FUNC);
-            const c = Color.fromHSLA(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), parseFloat(matches[4]));
+            const c = Color.fromHSLA(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), 0);
             this.red = c.red;
             this.green = c.green;
             this.blue = c.blue;
+            this.alpha = matches[4].includes("%") ? parseInt(matches[4]) / 100 : parseFloat(matches[4]);
+        } else if (REGEX_CMYK_FUNC_NON_CAP.test(colorString)) {
+            let matches = colorString.match(REGEX_CMYK_FUNC);
+            const c = Color.fromCMYK(parseInt(matches[1]), parseInt(matches[2]), parseInt(matches[3]), parseInt(matches[4]));
+            this.red = c.red;
+            this.green = c.green;
+            this.blue = c.blue;
+            this.alpha = 1;
         } else {
             throw new Error(`string "${colorString}" is not a known color format.`);
         }
