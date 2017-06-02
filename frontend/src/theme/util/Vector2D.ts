@@ -52,7 +52,7 @@ export function radToDeg(rads: number) {
     return rads / Math.PI * 180;
 }
 
-export default class Vector2D implements IVector2D {
+export default class Vector2D implements IVector2D{
 
     public x: number;
     public y: number;
@@ -66,7 +66,7 @@ export default class Vector2D implements IVector2D {
     }
 
     public get rotation() {
-        let alpha = degToRad(Math.acos(this.x / this.length));
+        let alpha = toPrecision(radToDeg(Math.acos(this.x / this.length)), 10);
         if (this.y >= 0) {
             return alpha;
         } else {
@@ -170,5 +170,13 @@ export default class Vector2D implements IVector2D {
     public subtract(other: IVector2D): IVector2D {
         this.add(other.clone().multiply(-1));
         return this;
+    }
+
+    public toString() {
+        return `(${this.x}|${this.y})`;
+    }
+
+    public toJSON() {
+        return `{"x":${this.x},"y":${this.y}}`;
     }
 }

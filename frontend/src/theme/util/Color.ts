@@ -169,9 +169,9 @@ export default class Color implements IColor {
     public set lightness(lightness: number) {
         let oldLightness = this.lightness;
         let relativeLightness = lightness / oldLightness;
-        this.red *= relativeLightness;
-        this.green *= relativeLightness;
-        this.blue *= relativeLightness;
+        this.red *= toPrecision(relativeLightness, 10);
+        this.green *= toPrecision(relativeLightness, 10);
+        this.blue *= toPrecision(relativeLightness, 10);
     }
 
     public get lightness() {
@@ -188,13 +188,20 @@ export default class Color implements IColor {
             .add(new Vector2D(this._green, 0).rotate(120))
             .add(new Vector2D(this._blue, 0).rotate(240))
             .rotate(degrees);
-        const alpha = toPrecision(angleBetweenVectors(new Vector2D(1,0), colorVector), 10);
+        const alpha = toPrecision(colorVector.rotation, 10);
         if (alpha >= 0 && alpha < 60) {
-            const n = new Vector2D(-colorVector.y / tan_60, colorVector.y);
-            const y_hs = (255 * (n.x * va.y - va.x * n.y)) / (n.x * vc.y - vc.x * n.y);
-            const y_gs = (255 * va.y + y_hs * vc.y) / n.y;
+            const n = colorVector.clone();//new Vector2D(-colorVector.y / tan_60, colorVector.y);
+            // {{y_hs->(-x_n y_a+x_a y_n)/(x_n y_e-x_e y_n)}}
+            const y_hs = (-n.x * pa.y + pa.x * n.y) / (n.x * vc.y - vc.x * n.y);
+            const y_gs = (va.y + y_hs * vc.y) / n.y;
             let ns = n.clone().scale(y_gs / n.length);
-            let green = vc.clone().scale(y_hs);
+            let hexagonSidePart = vc.clone();
+            hexagonSidePart.scale(y_hs);
+            let pointOnHexagon = pa.clone().add(hexagonSidePart);
+            let scale = pointOnHexagon.length / n.length;
+            let scaledColor = colorVector.clone().scale(scale);
+            let greenHex = new Vector2D(scaledColor.y / tan_60, scaledColor.y);
+            let green = vc.clone().scale(y_gs);
             let red = ns.clone().subtract(green);
             this.red = red.length;
             this.green = green.length;
@@ -203,6 +210,7 @@ export default class Color implements IColor {
         // restore the saved saturation and lightness values
         this.saturation = saturation;
         this.lightness = lightness;
+        console.log();
     }
 
     public get hue() {
