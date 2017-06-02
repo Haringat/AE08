@@ -39,6 +39,20 @@ const sin_120 = Math.sin(degToRad(120));
 const cos_120 = Math.cos(degToRad(120));
 const cos_240 = Math.cos(degToRad(240));
 
+const va = new Vector2D(1,0);
+const vb = new Vector2D(1,0).rotate(60);
+const vc = new Vector2D(1,0).rotate(120);
+const vd = new Vector2D(1,0);
+const ve = new Vector2D(1,0).rotate(240);
+const vf = new Vector2D(1,0).rotate(300);
+
+const pa = va.clone().multiply(255);
+const pb = vb.clone().multiply(255);
+const pc = vc.clone().multiply(255);
+const pd = vd.clone().multiply(255);
+const pe = ve.clone().multiply(255);
+const pf = vf.clone().multiply(255);
+
 export interface IColor {
     red: number;
     green: number;
@@ -175,44 +189,20 @@ export default class Color implements IColor {
             .add(new Vector2D(this._blue, 0).rotate(240))
             .rotate(degrees);
         const alpha = toPrecision(angleBetweenVectors(new Vector2D(1,0), colorVector), 10);
-        if (alpha >= 0 && alpha < 120) {
-            const green = new Vector2D(-colorVector.y / tan_60, colorVector.y);
-            this.green = green.length;
-            const red = colorVector.clone()
-                .subtract(green);
+        if (alpha >= 0 && alpha < 60) {
+            const n = new Vector2D(-colorVector.y / tan_60, colorVector.y);
+            const y_hs = (255 * (n.x * va.y - va.x * n.y)) / (n.x * vc.y - vc.x * n.y);
+            const y_gs = (255 * va.y + y_hs * vc.y) / n.y;
+            let ns = n.clone().scale(y_gs / n.length);
+            let green = vc.clone().scale(y_hs);
+            let red = ns.clone().subtract(green);
             this.red = red.length;
+            this.green = green.length;
             this.blue = 0;
-        } else if (alpha >= 120 && alpha < 180) {
-            const green = new Vector2D(-colorVector.y / tan_60, colorVector.y);
-            this.green = green.length;
-            const blue = colorVector.clone()
-                .subtract(green);
-            this.green += blue.length;
-            this.blue = blue.length;
-            this.red = 0;
-        } else if (alpha > 180 && alpha < 240) {
-            const green = new Vector2D(colorVector.y / tan_60, colorVector.y);
-            this.green = green.length;
-            const blue = colorVector.clone()
-                .subtract(green);
-            this.blue = blue.length;
-            this.green += blue.length;
-            this.red = 0;
-        } else {
-            const blue = new Vector2D(colorVector.y / tan_60, colorVector.y);
-            this.blue = blue.length;
-            const red = colorVector.clone()
-                .subtract(blue);
-            this.red = red.length;
-            this.green = 0;
         }
         // restore the saved saturation and lightness values
         this.saturation = saturation;
         this.lightness = lightness;
-        /*const green = toPrecision(2 * colorVector.x * cos_120 - colorVector.y * cos_240 / sin_120, 10);
-        this.green = Math.min(green, 255);
-        const blue = toPrecision((colorVector.y - green * Math.sin(Math.acos(1) + degToRad(120))) / Math.sin(Math.acos(1) + degToRad(240)), 10);
-        this.blue = blue;*/
     }
 
     public get hue() {
