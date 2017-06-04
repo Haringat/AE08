@@ -152,18 +152,24 @@ export default class Color implements IColor {
     }
 
     public get key() {
-        return Math.min(this._red, this._blue, this._green) * 100 / 255;
+        return Math.min(this.r, this.g, this.b) * 100;
     }
 
     public set saturation(saturation: number) {
+        let lightness = this.lightness;
+        let max = lightness / 100 * 255;
+        this.red *= saturation / 100
+        let minColor = Math.min(this.r, this.g, this.b);
+        let maxColor = Math.max(this.r, this.g, this.b);
+        let delta = maxColor - minColor;
         let oldSaturation = this.saturation;
-        let deltaSaturation = saturation - oldSaturation;
+        delta *= saturation / oldSaturation;
     }
 
     public get saturation() {
-        let minColor = Math.min(this._red, this._green, this._blue);
-        let maxColor = Math.max(this._red, this._green, this._blue);
-        return (maxColor - minColor) / 255 * 100 / (100 - Math.abs(2 * this.lightness - 100));
+        let minColor = Math.min(this.r, this.g, this.b);
+        let maxColor = Math.max(this.r, this.g, this.b);
+        return (maxColor - minColor) / (2 * (this.lightness / 100)) * 100;
     }
 
     public set lightness(lightness: number) {
@@ -175,9 +181,9 @@ export default class Color implements IColor {
     }
 
     public get lightness() {
-        let minColor = Math.min(this._red, this._green, this._blue);
-        let maxColor = Math.max(this._red, this._green, this._blue);
-        return (maxColor - minColor) / 255 / 2 * 100;
+        let minColor = Math.min(this.r, this.g, this.b);
+        let maxColor = Math.max(this.r, this.g, this.b);
+        return (maxColor + minColor) / 2 * 100;
     }
 
     public set hue(degrees: number) {
@@ -190,22 +196,19 @@ export default class Color implements IColor {
             .rotate(degrees);
         const alpha = toPrecision(colorVector.rotation, 10);
         if (alpha >= 0 && alpha < 60) {
-            const n = colorVector.clone();//new Vector2D(-colorVector.y / tan_60, colorVector.y);
-            // {{y_hs->(-x_n y_a+x_a y_n)/(x_n y_e-x_e y_n)}}
-            const y_hs = (-n.x * pa.y + pa.x * n.y) / (n.x * vc.y - vc.x * n.y);
-            const y_gs = (va.y + y_hs * vc.y) / n.y;
-            let ns = n.clone().scale(y_gs / n.length);
+            const nv = colorVector.clone();
+            const c = (-nv.x * pa.y + pa.x * nv.y) / (nv.x * vc.y - vc.x * nv.y);
+            let pointOnCircle = colorVector.clone();
+            pointOnCircle.length = 255;
             let hexagonSidePart = vc.clone();
-            hexagonSidePart.scale(y_hs);
-            let pointOnHexagon = pa.clone().add(hexagonSidePart);
-            let scale = pointOnHexagon.length / n.length;
+            hexagonSidePart.scale(c);
+            let pointOnHexagonSide = pa.clone().add(hexagonSidePart);
+            let scale = pointOnHexagonSide.length / pointOnCircle.length;
             let scaledColor = colorVector.clone().scale(scale);
             let greenHex = new Vector2D(scaledColor.y / tan_60, scaledColor.y);
-            let green = vc.clone().scale(y_gs);
-            let red = ns.clone().subtract(green);
-            this.red = red.length;
-            this.green = green.length;
-            this.blue = 0;
+            let redHex = scaledColor.clone().subtract(greenHex);
+            this.green = greenHex.length;
+            this.red = redHex.length;
         }
         // restore the saved saturation and lightness values
         this.saturation = saturation;
@@ -226,6 +229,18 @@ export default class Color implements IColor {
         } else {
             return 180 + angle;
         }
+    }
+
+    private get r() {
+        return this._red / 255;
+    }
+
+    private get g() {
+        return this._green / 255;
+    }
+
+    private get b() {
+        return this._blue / 255;
     }
 
     public constructor(red: number, green: number, blue: number, alpha?: number);

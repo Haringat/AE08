@@ -115,7 +115,7 @@ test("can be rotated", async spec => {
     spec.plan(3);
 
     let color = new Color(255, 0, 0);
-    color.rotate(55);
+    color.rotate(45);
     spec.is(color.red, 0);
     spec.is(color.green, 255);
     spec.is(color.blue, 21);

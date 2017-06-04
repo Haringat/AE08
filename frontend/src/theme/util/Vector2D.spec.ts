@@ -1,7 +1,9 @@
 import test from "ava";
 import Vector2D, {angleBetweenVectors, radToDeg, toPrecision} from "./Vector2D";
+import Color3D from "./Color3D";
 
 test("can create 2D vectors", async spec => {
+    new Color3D();
     spec.plan(2);
     let v = new Vector2D(1,2);
     spec.is(v.x, 1);

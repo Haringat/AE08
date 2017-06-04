@@ -1,3 +1,15 @@
+export interface IVector {
+    length: number;
+    clone(): IVector;
+    scale(scale: number): IVector;
+    normalize(): IVector;
+    add(other: IVector): IVector;
+    subtract(other: IVector): IVector;
+    angleToVector(other: IVector): number;
+    multiply(scalar: number): IVector;
+    multiply(vector: IVector): number;
+}
+
 /**
  * @typedef IVector2D
  * @interface
@@ -17,7 +29,7 @@
  * @property {function(other:IVector2D):number} multiply
  * @property {function(other:number):IVector2D} multiply
  */
-export interface IVector2D {
+export interface IVector2D extends IVector {
     x: number;
     y: number;
     length: number;
@@ -36,6 +48,9 @@ export interface IVector2D {
 }
 
 export function angleBetweenVectors(a: IVector2D, b: IVector2D) {
+    if (a.length === 0 || b.length === 0) {
+        return 0;
+    }
     let c = b.clone().add(a);
     return radToDeg(Math.acos((c.length * c.length - a.length * a.length - b.length * b.length) / ( 2 * a.length * b.length)));
 }
@@ -97,12 +112,15 @@ export default class Vector2D implements IVector2D{
     }
 
     /**
-     * returns the mathematically positive angle from another vector to this vector
-     * @param other
+     * returns the mathematically positive angle from this vector to another vector
+     * @param {IVector2D} other
      * @return {number}
      */
-    public angleFromVector(other: IVector2D) {
-        let delta = this.rotation - other.rotation;
+    public angleToVector(other: IVector2D) {
+        if (this.length === 0 || other.length === 0) {
+            return 0;
+        }
+        let delta = other.rotation - this.rotation;
         if (delta >= 0) {
             return delta;
         } else {
@@ -111,12 +129,15 @@ export default class Vector2D implements IVector2D{
     }
 
     /**
-     * returns the mathematically positive angle from this vector to another vector
-     * @param {IVector2D} other
+     * returns the mathematically positive angle from another vector to this vector
+     * @param other
      * @return {number}
      */
-    public angleToVector(other: IVector2D) {
-        let delta = other.rotation - this.rotation;
+    public angleFromVector(other: IVector2D) {
+        if (this.length === 0 || other.length === 0) {
+            return 0;
+        }
+        let delta = this.rotation - other.rotation;
         if (delta >= 0) {
             return delta;
         } else {
