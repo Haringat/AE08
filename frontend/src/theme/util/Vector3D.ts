@@ -28,7 +28,7 @@ export interface IVector3D extends IVector {
     clone(): IVector3D;
     scale(scale: number): IVector3D;
     cross(other: IVector3D | Matrix33): IVector3D;
-    rotate(degrees: number, axis: IVector3D);
+    rotate(degrees: number, axis: IVector3D): IVector3D;
     normalize(): IVector3D;
     add(other: IVector3D): IVector3D;
     subtract(other: IVector3D): IVector3D;
@@ -52,7 +52,7 @@ export default class Vector3D implements IVector {
     public z: number;
 
     public get length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+        return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
     }
 
     public set length(length: number) {
@@ -156,6 +156,14 @@ export default class Vector3D implements IVector {
     }
 
     public toJSON() {
-        return `{"x":${this.x},"y":${this.y},"z":${this.z}`;
+        return {
+            x: this.x,
+            y: this.y,
+            z: this.z
+        };
+    }
+
+    public parse(model: {x: number, y: number, z: number}) {
+        return new Vector3D(model.x, model.y, model.z);
     }
 }

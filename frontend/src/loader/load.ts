@@ -8,7 +8,7 @@ function delay(seconds) {
     try {
         console.log("loading app...");
         // TODO: uncomment to see splash screen
-        await delay(5);
+        //await delay(5);
         require("../../../dist/shim");
         require("../app");
         console.log("app loaded");

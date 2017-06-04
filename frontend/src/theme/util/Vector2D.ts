@@ -198,6 +198,9 @@ export default class Vector2D implements IVector2D{
     }
 
     public toJSON() {
-        return `{"x":${this.x},"y":${this.y}}`;
+        return {
+            x: this.x,
+            y: this.y
+        };
     }
 }

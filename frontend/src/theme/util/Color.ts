@@ -1,4 +1,5 @@
 import Vector2D, {angleBetweenVectors, degToRad, toPrecision} from "./Vector2D";
+import {hexToDec} from "./MathUtil";
 
 //language=RegExp
 const NUM_0_255 = "\\s*(?:[0-1]?\\d{1,2}|2(?:[0-4]\\d|5[0-5]))\\s*";
@@ -33,26 +34,6 @@ const REGEX_HSLA_FUNC = new RegExp(`^\\s*hsla\\((${NUM_0_360}),(${PERCENT}),(${P
 //language=RegExp
 const REGEX_CMYK_FUNC = new RegExp(`^\\s*cmyk\\((${PERCENT}),(${PERCENT}),(${PERCENT}),(${PERCENT})\\)\\s*;?\\s*$`, "i");
 
-const tan_60 = Math.tan(degToRad(60));
-const sin_60 = Math.sin(degToRad(60));
-const sin_120 = Math.sin(degToRad(120));
-const cos_120 = Math.cos(degToRad(120));
-const cos_240 = Math.cos(degToRad(240));
-
-const va = new Vector2D(1,0);
-const vb = new Vector2D(1,0).rotate(60);
-const vc = new Vector2D(1,0).rotate(120);
-const vd = new Vector2D(1,0);
-const ve = new Vector2D(1,0).rotate(240);
-const vf = new Vector2D(1,0).rotate(300);
-
-const pa = va.clone().multiply(255);
-const pb = vb.clone().multiply(255);
-const pc = vc.clone().multiply(255);
-const pd = vd.clone().multiply(255);
-const pe = ve.clone().multiply(255);
-const pf = vf.clone().multiply(255);
-
 export interface IColor {
     red: number;
     green: number;
@@ -60,10 +41,6 @@ export interface IColor {
     alpha: number;
     clone(): IColor;
     rotate(degrees: number): IColor;
-}
-
-function hexToDec(hex: string) {
-    return Number(`0x${hex}`);
 }
 
 export default class Color implements IColor {
@@ -156,79 +133,42 @@ export default class Color implements IColor {
     }
 
     public set saturation(saturation: number) {
-        let lightness = this.lightness;
-        let max = lightness / 100 * 255;
-        this.red *= saturation / 100
-        let minColor = Math.min(this.r, this.g, this.b);
-        let maxColor = Math.max(this.r, this.g, this.b);
-        let delta = maxColor - minColor;
-        let oldSaturation = this.saturation;
-        delta *= saturation / oldSaturation;
+        let hsl = this._toHSL();
+        hsl.saturation = saturation;
+        const c = Color.fromHSLA(hsl.hue, hsl.saturation, hsl.lightness, this.alpha);
+        this.red = toPrecision(c.red, 10);
+        this.green = toPrecision(c.green, 10);
+        this.blue = toPrecision(c.blue, 10);
     }
 
     public get saturation() {
-        let minColor = Math.min(this.r, this.g, this.b);
-        let maxColor = Math.max(this.r, this.g, this.b);
-        return (maxColor - minColor) / (2 * (this.lightness / 100)) * 100;
+        return this._toHSL().saturation;
     }
 
     public set lightness(lightness: number) {
-        let oldLightness = this.lightness;
-        let relativeLightness = lightness / oldLightness;
-        this.red *= toPrecision(relativeLightness, 10);
-        this.green *= toPrecision(relativeLightness, 10);
-        this.blue *= toPrecision(relativeLightness, 10);
+        let hsl = this._toHSL();
+        hsl.lightness = lightness;
+        const c = Color.fromHSLA(hsl.hue, hsl.saturation, hsl.lightness, this.alpha);
+        this.red = toPrecision(c.red, 10);
+        this.green = toPrecision(c.green, 10);
+        this.blue = toPrecision(c.blue, 10);
     }
 
     public get lightness() {
-        let minColor = Math.min(this.r, this.g, this.b);
-        let maxColor = Math.max(this.r, this.g, this.b);
-        return (maxColor + minColor) / 2 * 100;
+        return this._toHSL().lightness;
     }
 
     public set hue(degrees: number) {
-        // save saturation and lightness to restore them later because during the transformation they are lost
-        let saturation = this.saturation;
-        let lightness = this.lightness;
-        let colorVector = new Vector2D(this._red, 0)
-            .add(new Vector2D(this._green, 0).rotate(120))
-            .add(new Vector2D(this._blue, 0).rotate(240))
-            .rotate(degrees);
-        const alpha = toPrecision(colorVector.rotation, 10);
-        if (alpha >= 0 && alpha < 60) {
-            const nv = colorVector.clone();
-            const c = (-nv.x * pa.y + pa.x * nv.y) / (nv.x * vc.y - vc.x * nv.y);
-            let pointOnCircle = colorVector.clone();
-            pointOnCircle.length = 255;
-            let hexagonSidePart = vc.clone();
-            hexagonSidePart.scale(c);
-            let pointOnHexagonSide = pa.clone().add(hexagonSidePart);
-            let scale = pointOnHexagonSide.length / pointOnCircle.length;
-            let scaledColor = colorVector.clone().scale(scale);
-            let greenHex = new Vector2D(scaledColor.y / tan_60, scaledColor.y);
-            let redHex = scaledColor.clone().subtract(greenHex);
-            this.green = greenHex.length;
-            this.red = redHex.length;
-        }
-        // restore the saved saturation and lightness values
-        this.saturation = saturation;
-        this.lightness = lightness;
-        console.log();
+        let hsl = this._toHSL();
+        hsl.hue = degrees;
+        let c = Color.fromHSLA(hsl.hue, hsl.saturation, hsl.lightness, this.alpha);
+        this.red = toPrecision(c.red, 10);
+        this.green = toPrecision(c.green, 10);
+        this.blue = toPrecision(c.blue, 10);
     }
 
     public get hue() {
-        let red = new Vector2D(this._red, 0);
-        let green = new Vector2D(this._green, 0).rotate(120);
-        let blue = new Vector2D(this._blue, 0).rotate(240);
-        let colorVector = red.clone()
-            .add(green)
-            .add(blue);
-        let angle = angleBetweenVectors(new Vector2D(1,0), colorVector);
-        if (colorVector.y >= 0) {
-            return angle;
-        } else {
-            return 180 + angle;
-        }
+        return this._toHSL().hue;
     }
 
     private get r() {
@@ -372,5 +312,32 @@ export default class Color implements IColor {
         } else {
             throw new Error(`string "${colorString}" is not a known color format.`);
         }
+    }
+
+    private _toHSL() {
+        const r = this._red / 255;
+        const g = this._green / 255;
+        const b = this._blue / 255;
+        const min = Math.min(r,g,b);
+        const max = Math.max(r,g,b);
+        const delta = max - min;
+        let hsl = {
+            hue: 0,
+            saturation: 0,
+            lightness: (max + min) / 2
+        };
+        if (delta !== 0) {
+            if (max === r) {
+                hsl.hue = 60 * (((g - b) / delta) % 6);
+            } else if (max === g) {
+                hsl.hue = 60 * ((b - r) / delta + 2);
+            } else if (max === b) {
+                hsl.hue = 60 * ((r - g) / delta + 4);
+            }
+            hsl.saturation = delta / (1 - Math.abs(2 * hsl.lightness - 1));
+        }
+        hsl.lightness *= 100;
+        hsl.saturation *= 100;
+        return hsl;
     }
 }

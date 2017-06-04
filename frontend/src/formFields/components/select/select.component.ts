@@ -19,10 +19,12 @@ export interface IValue {
 @Component({
     selector: "x-ffs-select",
     templateUrl: "src/formFields/components/select/select.view.html",
-    inputs: ["model"],
+    inputs: ["model", "placeholder"],
     outputs: ["change"]
 })
 export default class SelectComponent implements OnInit, OnChanges {
+
+    public expanded: boolean;
 
     private _selectedValue: IValue;
 
@@ -51,6 +53,7 @@ export default class SelectComponent implements OnInit, OnChanges {
 
     public ngOnInit() {
         this.model = this.model || [];
+        this.expanded = false;
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -66,6 +69,11 @@ export default class SelectComponent implements OnInit, OnChanges {
         } else {
             this._selectedValue = selectedValues[0];
         }
+    }
+
+    toggleExpanded() {
+        this.expanded = !this.expanded;
+        console.log(`toggle expanded. Now ${this.expanded}`);
     }
 
 }
