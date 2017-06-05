@@ -58,6 +58,7 @@ export default class Color3D {
         } else {
 
         }
+        return 0;
     }
 
     private _vector: IVector3D;
@@ -97,7 +98,6 @@ export default class Color3D {
             let lightness = parseInt(matches[2]);
             let alpha = 1;
             const c = this.parseHSLA(hue, saturation, lightness, alpha);
-            this._alpha = c.alpha;
         } else if (REGEX_HSLA_FUNC_NON_CAP.test(colorString)) {
             let matches = colorString.match(REGEX_HSLA_FUNC);
             let hue = parseInt(matches[1]);
@@ -105,17 +105,13 @@ export default class Color3D {
             let lightness = parseInt(matches[2]);
             let alpha = matches[4].includes("%") ? parseInt(matches[4]) / 100 : parseFloat(matches[4]);
             const c = this.parseHSLA(hue, saturation, lightness, alpha);
-            this._vector = redVector.clone().multiply(c.red)
-                .add(greenVector.clone().multiply(c.green))
-                .add(blueVector.clone().multiply(c.blue));
-            this._alpha = c.alpha;
         } else if (REGEX_CMYK_FUNC_NON_CAP.test(colorString)) {
             const matches = colorString.match(REGEX_CMYK_FUNC);
             const cyan = parseInt(matches[1]);
             const magenta = parseInt(matches[2]);
             const yellow = parseInt(matches[3]);
             const key = parseInt(matches[4]);
-            this._vector = Color3D.fromCMYK(cyan, magenta, yellow, key);
+            this.parseCMYK(cyan, magenta, yellow, key);
             this._alpha = 1;
         } else {
             throw new Error(`string "${colorString}" is not a known color format.`);

@@ -2,8 +2,15 @@ import {readFile, writeFile} from "./node/fs";
 import {EEXIST, ENOENT, EISDIR, EPERM, ENFILE, EINTR, ENOMEM, EACCES} from "constants";
 import ErrnoException = NodeJS.ErrnoException;
 
-
 export interface IConfig {
+    api: {
+        host: string,
+        port: number
+    },
+    db: {
+        host: string,
+        port: number
+    }
     mainWindow: {
         size: {
             width: number,
@@ -19,7 +26,15 @@ export interface IConfig {
 
 const configPath = "./config.json";
 
-const defaultConfig: IConfig = {
+const defaultConfig = {
+    api: {
+        host: "::1",
+        port: 6500
+    },
+    db: {
+        host: "::1",
+        port: 5432
+    },
     mainWindow: {
         size: {
             width: 800,
@@ -34,26 +49,26 @@ const defaultConfig: IConfig = {
 };
 
 export default async function readConfig(attempt: number = 1) {
-    let configFileContent: Buffer;
+    if (attempt > 10) {
+        throw new Error(`critical: Giving up after 10 attempts...`)
+    }
     try {
-        configFileContent = await readFile(configPath);
+        const configFileContent = await readFile(configPath);
+        return JSON.parse(configFileContent.toString());
     } catch (e) {
         const error: NodeJS.ErrnoException = e;
         switch (-error.errno) {
             case ENOENT:
                 console.log("info: config file does not exist. Creating it...");
-                return await createConfigFile();
+                await createConfigFile();
+                return await readConfig(attempt + 1);
             case EISDIR:
                 throw new Error(`critical: "${configPath}" exists but is a directory.`);
             case EPERM:
                 throw new Error(`critical: You lack the required access rights for "${configPath}"`);
             case ENFILE:
-                if (attempt < 10) {
-                    console.log(`warning: too many open files (${attempt}. attempt). Trying again...`);
-                    return await readConfig(attempt + 1);
-                } else {
-                    throw new Error(`critical: too many open files. Giving up after 3 attempts`);
-                }
+                console.log(`severe: too many open files. Trying again...`);
+                return await readConfig(attempt + 1);
             case ENOMEM:
                 throw new Error(`critical: Out of memory.`);
             default:
@@ -61,13 +76,13 @@ export default async function readConfig(attempt: number = 1) {
                 throw new Error(`critical: unknown error occurred while trying to read config file.`);
         }
     }
-    return JSON.parse(configFileContent.toString());
 }
 
 async function createConfigFile(attempt: number = 1) {
     try {
-        await writeFile(configPath, JSON.stringify(defaultConfig));
+        await writeFile(configPath, JSON.stringify(defaultConfig, null, 4));
     } catch (e) {
+        //noinspection UnnecessaryLocalVariableJS
         const error: NodeJS.ErrnoException = e;
         switch (error.errno) {
             case EEXIST:
@@ -91,5 +106,4 @@ async function createConfigFile(attempt: number = 1) {
                 throw new Error(`critical: unknown error occurred while trying to write config file.`);
         }
     }
-    return await readConfig();
 }
