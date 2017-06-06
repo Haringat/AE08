@@ -36,12 +36,14 @@
     "systemjs-plugin-babel": "0.0.21",
     "systemjs-plugin-traceur": "0.0.3",
     "tslib": "^1.7.1",
+    "uuid": "^3.0.1",
     "zone.js": "^0.8.10"
   },
   "devDependencies": {
     "@types/gulp": "^4.0.2",
     "@types/node": "^7.0.18",
     "@types/systemjs": "^0.20.2",
+    "@types/uuid": "^3.0.0",
     "ava": "^0.19.1",
     "gulp": "^3.9.1",
     "gulp-task-loader": "git+https://github.com/Haringat/gulp-task-loader.git",
