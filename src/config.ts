@@ -26,7 +26,7 @@ export interface IConfig {
 
 const configPath = "./config.json";
 
-const defaultConfig = {
+const defaultConfig: IConfig = {
     api: {
         host: "::1",
         port: 6500
@@ -50,7 +50,7 @@ const defaultConfig = {
 
 export default async function readConfig(attempt: number = 1) {
     if (attempt > 10) {
-        throw new Error(`critical: Giving up after 10 attempts...`)
+        throw new Error(`critical: Giving up after 10 attempts...`);
     }
     try {
         const configFileContent = await readFile(configPath);
