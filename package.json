@@ -46,7 +46,7 @@
     "gulp": "^3.9.1",
     "gulp-task-loader": "git+https://github.com/Haringat/gulp-task-loader.git",
     "gulp-typescript": "^3.1.6",
-    "pg-promise": "^5.7.0",
+    "pg-promise": "^5.9.0",
     "reflect-metadata": "^0.1.10",
     "typescript": "^2.3.2"
   },
