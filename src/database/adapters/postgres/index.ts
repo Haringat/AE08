@@ -3,28 +3,22 @@ import * as pgPromiseLib from "pg-promise";
 
 const pgPromise: pgPromiseLib.IMain = pgPromiseLib();
 
-abstract class A {
+export default class Connection {
 
-}
+    private _connection: pgPromiseLib.IDatabase<any>;
 
-export default abstract class Connection {
-
-    private static _connection: pgPromiseLib.IDatabase<any>;
-
-    public static async connect(connectionParams: pgPromiseLib.IConfig) {
+    public constructor(connectionParams: pgPromiseLib.IConfig) {
         this._connection = pgPromise(connectionParams);
     }
 
-    public static async validateModel(model: Array<ITableModel>) {
-        let tables = await this._connection.manyOrNone("\\t");
+    public async validateModel(model: Array<ITableModel>) {
+        let tables = await this._connection.manyOrNone("\\d");
         await model.forEachAsync(async (tableModel) => {
             if (!~tables.indexOf(tableModel.name)) {
-
+                throw new Error(`Table ${tableModel.name} from model is not present in the database.`);
             }
+            let columns = await this._connection.manyOrNone(`\\d+ "${tableModel.name}"`);
+
         });
     }
-}
-
-export function validateModel(model: Array<ITableModel>) {
-
 }

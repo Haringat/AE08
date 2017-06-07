@@ -2,6 +2,8 @@ import {readFile, writeFile} from "./node/fs";
 import {EEXIST, ENOENT, EISDIR, EPERM, ENFILE, EINTR, ENOMEM, EACCES} from "constants";
 import ErrnoException = NodeJS.ErrnoException;
 
+export type databases = "postgres" | "mysql" | "mssql";
+
 export interface IConfig {
     api: {
         host: string,
@@ -9,7 +11,8 @@ export interface IConfig {
     },
     db: {
         host: string,
-        port: number
+        port: number,
+        adapter: databases
     }
     mainWindow: {
         size: {
@@ -33,7 +36,8 @@ const defaultConfig: IConfig = {
     },
     db: {
         host: "::1",
-        port: 5432
+        port: 5432,
+        adapter: "postgres"
     },
     mainWindow: {
         size: {

@@ -44,6 +44,7 @@ export class TableModel<T extends IModel> implements ITableModel {
     stack: Array<IChange>;
 
     getDataSet(column: string, value: any): T {
+        // TODO: get data set
         return undefined;
     }
 
