@@ -79,16 +79,19 @@ export abstract class ModelTable<T extends IModel> implements IModel {
         }).forEach((prop) => {
             model[`_${prop}`] = model[prop];
         });
-        const transformedModel: ModelTable<T> = Object.setPrototypeOf(model, Object.getPrototypeOf(this));
+        const transformedModel: ModelTable<T> = Object.setPrototypeOf(model, this.prototype);
         transformedModel.validate();
         //noinspection JSMismatchedCollectionQueryUpdate
-        let dataSets: Array<ModelTable<T>> = Reflect.getOwnMetadata(datasetMetadataKey, this.prototype);
+        let dataSets: Array<ModelTable<T>> = Reflect.getOwnMetadata(datasetMetadataKey, this.prototype) || [];
         dataSets.push(transformedModel);
+        Reflect.defineMetadata(datasetMetadataKey, dataSets, this.prototype);
         return transformedModel;
     }
 
     public static getDataSet<T extends IModel>(where: Array<{column: string, value: any}>): T {
         let dataSets: Array<T> = Reflect.getOwnMetadata(datasetMetadataKey, this.prototype);
+        console.log("got datasets");
+        console.log(dataSets);
         return dataSets.find(dataSet => {
             return where.every(constraint => dataSet[constraint.column] === constraint.value);
         });

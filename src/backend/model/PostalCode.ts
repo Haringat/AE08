@@ -4,7 +4,6 @@ import City from "./City";
 
 export interface IPostalCode extends IModel {
     postalCode: string;
-    city: string;
 }
 
 @Table({
@@ -25,12 +24,5 @@ export default class PostalCode extends ModelTable<IPostalCode> implements IPost
         type: DataType.VARCHAR,
     })
     public postalCode: string;
-
-    @Column({
-        columnName: "city",
-        references: City,
-        type: DataType.UUID
-    })
-    public city: string;
 
 }

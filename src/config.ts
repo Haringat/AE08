@@ -73,19 +73,20 @@ export default async function readConfig(attempt: number = 1) {
         return config;
     } catch (e) {
         const error: NodeJS.ErrnoException = e;
-        switch (-error.errno) {
-            case ENOENT:
+        console.log(error.errno);
+        switch (error.code) {
+            case "ENOENT":
                 console.log("info: config file does not exist. Creating it...");
                 await createConfigFile();
                 return await readConfig(attempt + 1);
-            case EISDIR:
+            case "EISDIR":
                 throw new Error(`critical: "${configPath}" exists but is a directory.`);
-            case EPERM:
+            case "EPERM":
                 throw new Error(`critical: You lack the required access rights for "${configPath}"`);
-            case ENFILE:
+            case "ENFILE":
                 console.log(`severe: too many open files. Trying again...`);
                 return await readConfig(attempt + 1);
-            case ENOMEM:
+            case "ENOMEM":
                 throw new Error(`critical: Out of memory.`);
             default:
                 console.log(error);
@@ -100,23 +101,23 @@ async function createConfigFile(attempt: number = 1) {
     } catch (e) {
         //noinspection UnnecessaryLocalVariableJS
         const error: NodeJS.ErrnoException = e;
-        switch (error.errno) {
-            case EEXIST:
+        switch (error.code) {
+            case "EEXIST":
                 console.log("config file already exists.");
                 break;
-            case EISDIR:
+            case "EISDIR":
                 throw new Error(`critical: "${configPath}" already exists but is a directory.`);
-            case EACCES:
-            case EPERM:
+            case "EACCES":
+            case "EPERM":
                 throw new Error(`critical: You lack the required permissions to create "${configPath}"`);
-            case EINTR:
+            case "EINTR":
                 if (attempt < 10) {
                     console.log(`warning: could not create error file due to system call interrupt. (attempt ${attempt}). Trying again...`);
                     return createConfigFile(attempt + 1);
                 } else {
                     throw new Error(`critical: could not create error file due to system call interrupt. Giving up after ${attempt} attempt.`);
                 }
-            case ENOMEM:
+            case "ENOMEM":
                 throw new Error(`critical: Out of memory.`);
             default:
                 throw new Error(`critical: unknown error occurred while trying to write config file.`);

@@ -68,17 +68,19 @@ export default class Connection extends AbstractConnection {
     }
 
     public async getAll(model: Array<ITableModel>) {
-        return await model.mapAsync(async (tableModel) => {
-            console.log(`select \${columns^} from "${tableModel.name}";`, {
-                columns: tableModel.columns.map(col => col.name)
-            });
+        let all = await model.mapAsync(async (tableModel) => {
+            console.log(`select ${tableModel.columns.map(col => col.name)} from "${tableModel.name}";`);
             return {
                 name: tableModel.name,
-                values: await this._connection.manyOrNone(`select \${columns^} from "${tableModel.name}";`, {
+                values: await this._connection.manyOrNone(`select \${columns~} from "${tableModel.name}";`, {
                     columns: tableModel.columns.map(col => col.name)
                 })
             };
         });
+        all.forEach(some => {
+            console.log(some.values);
+        });
+        return all;
     }
 
     private static _getValueObject(values: Array<{column: string, value: string}>) {

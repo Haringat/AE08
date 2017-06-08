@@ -22,7 +22,7 @@ INSERT INTO "persons" (uuid, forename, surname, address) VALUES (
     'a0dd58d9-06e3-4939-8b3e-e15702c8a7ff', 'Marcel', 'Mundl', '9d9d91d7-f3e2-4072-a171-efe5b48b21e5'
 );
 INSERT INTO "emailAddresses" (uuid, email, person) VALUES (
-    '390bf9fa-c8a1-4fdf-9ba1-b02db5530cf9', 'Marcel@Mundlhome.de', 'a0dd58d9-06e3-4939-8b3e-e15702c8a7ff'
+    '390bf9fa-c8a1-4fdf-9ba1-b02db5530cf9', 'marcel@mundlhome.de', 'a0dd58d9-06e3-4939-8b3e-e15702c8a7ff'
 );
 INSERT INTO "users" (uuid, person, password, salt) VALUES (
     '31b572ac-4df6-43bd-834e-fea150d66f7a', 'a0dd58d9-06e3-4939-8b3e-e15702c8a7ff', '851d4ac925c2650dc460d206c0aef14e2d7d4a0c', 'a0e70aa2a0ffff5f8b28b186b7fa67d1886530d6c7232e0f7c61bad780e0bb0f836f7425a1b7575b78d44e708b9f247befe47e58615dcaee005e3bbb8e67e458'

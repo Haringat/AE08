@@ -317,7 +317,6 @@ export function Table(metadata: ITableMetadata): ClassDecorator {
 export function Column(metadata: IColumnMetadata): PropertyDecorator {
     return function (target: IModel, propertyKey: string) {
         let tableModel: TableModel<typeof target> = Reflect.hasOwnMetadata(tableMetadataKey, target) ? Reflect.getOwnMetadata(tableMetadataKey, target) : new TableModel<typeof target>();
-        console.log(`pushing on top of ${tableModel.columns.length} columns`);
         if (metadata.primaryKey === true) {
             tableModel.primaryKey.push(propertyKey);
         }

@@ -1,9 +1,10 @@
 import {Column, DataType, Table} from "../../database/Table";
 import {IModel, ModelTable} from "../../database/Model";
 import Country from "./Country";
+import City from "./City";
 
 export interface IPhoneAreaCode extends IModel {
-    country: string;
+    city: string;
     areaCode: string;
 }
 
@@ -19,11 +20,11 @@ export default class PhoneAreaCode extends ModelTable<IPhoneAreaCode> implements
     public uuid: string;
 
     @Column({
-        columnName: "country",
-        references: Country,
+        columnName: "city",
+        references: City,
         type: DataType.UUID
     })
-    public country: string;
+    public city: string;
 
     @Column({
         columnName: "areaCode",
