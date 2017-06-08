@@ -63,6 +63,7 @@ process.on("unhandledRejection", (e) => {
                             expires: new Date(Date.now() + tokenLifeTime)
                         });
                     }
+                    await TableModel.commit();
                     response.status(200).send({
                         success: true,
                         data: {

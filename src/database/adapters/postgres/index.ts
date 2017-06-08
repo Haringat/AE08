@@ -42,7 +42,7 @@ export default class Connection extends AbstractConnection {
                         const insertion: IInsertion = <IInsertion> change.change;
                         const columns = insertion.values.map(v => v.column);
                         const valuePlaceholders = columns.map(c => `\${${c}:value}`).join(', ');
-                        await transaction.none(`insert into "\${table~}" (\${columns^}) values (${valuePlaceholders});`, {
+                        await transaction.none(`insert into \${table~} (\${columns~}) values (${valuePlaceholders});`, {
                             table: change.table,
                             columns: columns,
                             ...Connection._getValueObject(insertion.values)
@@ -60,7 +60,15 @@ export default class Connection extends AbstractConnection {
                     }
                     case ChangeType.UPDATE: {
                         const update = <IUpdate> change.change;
-                        await transaction.none(`update set ${Connection._getSetters(update.set)} where ${Connection._getConstraints(update.where)}`);
+                        console.log(`update set ${Connection._getSetters(update.set)} where ${Connection._getConstraints(update.where)};`);
+                        console.log(Object.assign({}, Connection._getValueObject(update.set.map(v => {
+                            v.column += ".set";
+                            return v;
+                        })), Connection._getValueObject(update.where)));
+                        await transaction.none(`update set ${Connection._getSetters(update.set)} where ${Connection._getConstraints(update.where)};`, Object.assign({}, Connection._getValueObject(update.set.map(v => {
+                            v.column += ".set";
+                            return v;
+                        })), Connection._getValueObject(update.where)));
                     }
                 }
             });
@@ -69,7 +77,6 @@ export default class Connection extends AbstractConnection {
 
     public async getAll(model: Array<ITableModel>) {
         let all = await model.mapAsync(async (tableModel) => {
-            console.log(`select ${tableModel.columns.map(col => col.name)} from "${tableModel.name}";`);
             return {
                 name: tableModel.name,
                 values: await this._connection.manyOrNone(`select \${columns~} from "${tableModel.name}";`, {
@@ -92,10 +99,10 @@ export default class Connection extends AbstractConnection {
     }
 
     private static _getConstraints(where: Array<{column: string, value: string}>) {
-        return where.map(v => `"${v.column}" = \${${v.column}:value}`).join(" AND ");
+        return where.map(v => `"${v.column}" = \${${v.column}~}`).join(" AND ");
     }
 
     private static _getSetters(where: Array<{column: string, value: string}>) {
-        return where.map(v => `(\${columns^}) = \${${v.column}:value}`).join(" AND ");
+        return where.map(v => `"${v.column}" = \${${v.column}.set~}`).join(" AND ");
     }
 }

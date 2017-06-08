@@ -102,7 +102,7 @@ export class TableModel<T extends IModel> implements ITableModel {
             propertyName: opts.propertyKey,
             foreignKey: !!opts.metadata.references,
             references: opts.metadata.references
-        })
+        });
         const generateUpdate: (model: IModel, updateColumn: string, updateValue: any) => IChange = (model, updateColumn, updateValue) => {
             let currentValues = this.columns.map(c => {
                 return {
@@ -263,6 +263,7 @@ export class TableModel<T extends IModel> implements ITableModel {
         try {
             await this._adapter.commitChanges(this.stack);
         } catch (e) {
+            console.log(e);
             await this.rollback(this.stack);
         } finally {
             this.stack = [];

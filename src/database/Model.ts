@@ -60,6 +60,7 @@ export abstract class ModelTable<T extends IModel> implements IModel {
                 values: newValues
             }
         });
+        console.log(TableModel.stack[0].change);
     }
 
     public validate() {
@@ -90,8 +91,6 @@ export abstract class ModelTable<T extends IModel> implements IModel {
 
     public static getDataSet<T extends IModel>(where: Array<{column: string, value: any}>): T {
         let dataSets: Array<T> = Reflect.getOwnMetadata(datasetMetadataKey, this.prototype);
-        console.log("got datasets");
-        console.log(dataSets);
         return dataSets.find(dataSet => {
             return where.every(constraint => dataSet[constraint.column] === constraint.value);
         });
