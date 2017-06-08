@@ -3,7 +3,6 @@ import {IModel, ModelTable} from "../../database/Model";
 import Street from "./Street";
 
 export interface IAddress extends IModel {
-    uuid?: string;
     street: string;
     houseNumber: number;
     addition: string;
@@ -12,11 +11,12 @@ export interface IAddress extends IModel {
 @Table({
     name: "addresses"
 })
-export default class Address extends ModelTable implements IAddress {
+export default class Address extends ModelTable<IAddress> implements IAddress {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -39,9 +39,5 @@ export default class Address extends ModelTable implements IAddress {
         size: 1
     })
     public addition: string;
-
-    constructor(model: IAddress) {
-        super(model);
-    }
 
 }

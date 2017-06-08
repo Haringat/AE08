@@ -13,10 +13,11 @@ export interface ICityPostalCodeCountry extends IModel {
 @Table({
     name: "citiesPostalCodesCountries"
 })
-export default class CityPostalCodeCountry extends ModelTable implements ICityPostalCodeCountry {
+export default class CityPostalCodeCountry extends ModelTable<ICityPostalCodeCountry> implements ICityPostalCodeCountry {
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -41,7 +42,4 @@ export default class CityPostalCodeCountry extends ModelTable implements ICityPo
     })
     public city: string;
 
-    constructor(model: ICityPostalCodeCountry) {
-        super(model);
-    }
 }

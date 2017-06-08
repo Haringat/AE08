@@ -4,16 +4,18 @@ import {IModel, ModelTable} from "../../database/Model";
 export interface IUser extends IModel {
     password: string;
     salt: string;
+    person: string;
 }
 
 @Table({
     name: "users"
 })
-export default class User extends ModelTable implements IUser {
+export default class User extends ModelTable<IUser> implements IUser {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -25,12 +27,15 @@ export default class User extends ModelTable implements IUser {
 
     @Column({
         columnName: "salt",
-        type: DataType.VARCHAR
+        type: DataType.VARCHAR,
+        size: 2048
     })
     public salt: string;
 
-    constructor(model: IUser) {
-        super(model);
-    }
+    @Column({
+        columnName: "person",
+        type: DataType.UUID
+    })
+    public person: string;
 
 }

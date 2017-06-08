@@ -9,11 +9,12 @@ export interface ICountry extends IModel {
 @Table({
     name: "countries"
 })
-export default class Country extends ModelTable implements ICountry {
+export default class Country extends ModelTable<ICountry> implements ICountry {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -24,12 +25,8 @@ export default class Country extends ModelTable implements ICountry {
     public code: string;
 
     @Column({
-        columnName: "code",
+        columnName: "phoneCode",
         type: DataType.VARCHAR
     })
     public phoneCode: number;
-
-    constructor(model: ICountry) {
-        super(model);
-    }
 }

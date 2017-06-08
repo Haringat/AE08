@@ -1,5 +1,6 @@
 import electron = require("electron");
 import readConfig from "./config";
+import "./backend/app";
 
 type BrowserWindowType = typeof electron.BrowserWindow.prototype;
 

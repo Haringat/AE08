@@ -11,11 +11,12 @@ export interface IContact extends IModel {
 @Table({
     name: "contacts"
 })
-export default class Contact extends ModelTable implements IContact {
+export default class Contact extends ModelTable<IContact> implements IContact {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -33,7 +34,4 @@ export default class Contact extends ModelTable implements IContact {
     })
     public contactPerson: string;
 
-    constructor(model: IContact) {
-        super(model);
-    }
 }

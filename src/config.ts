@@ -6,26 +6,31 @@ export type databases = "postgres" | "mysql" | "mssql";
 
 export interface IConfig {
     api: {
-        host: string,
-        port: number
-    },
+        host: string;
+        port: number;
+    };
     db: {
-        host: string,
-        port: number,
-        adapter: databases
-    }
+        host: string;
+        port: number;
+        database: string;
+        username: string;
+        password: string;
+        adapter: databases;
+    };
     mainWindow: {
         size: {
-            width: number,
-            height: number,
-            isMaximized: boolean
-        },
+            width: number;
+            height: number;
+            isMaximized: boolean;
+        };
         position: {
-            x: number,
-            y: number,
-        }
-    }
+            x: number;
+            y: number;
+        };
+    };
 }
+
+let config: IConfig;
 
 const configPath = "./config.json";
 
@@ -37,6 +42,9 @@ const defaultConfig: IConfig = {
     db: {
         host: "::1",
         port: 5432,
+        database: "AE08",
+        username: "postgres",
+        password: "postgres",
         adapter: "postgres"
     },
     mainWindow: {
@@ -53,12 +61,16 @@ const defaultConfig: IConfig = {
 };
 
 export default async function readConfig(attempt: number = 1) {
+    if (config) {
+        return config;
+    }
     if (attempt > 10) {
         throw new Error(`critical: Giving up after 10 attempts...`);
     }
     try {
         const configFileContent = await readFile(configPath);
-        return JSON.parse(configFileContent.toString());
+        config = JSON.parse(configFileContent.toString());
+        return config;
     } catch (e) {
         const error: NodeJS.ErrnoException = e;
         switch (-error.errno) {

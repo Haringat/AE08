@@ -1,0 +1,16 @@
+<x-ffs-select [model]="views" (change)="setView($event)"></x-ffs-select>
+<table [class.table-view]="view === &quot;table&quot;" [class.list-view]="view === &quot;list&quot;" class="contact-list">
+    <thead *ngIf="view === &quot;table&quot;">
+        <tr>
+            <td>Vorname</td>
+            <td>Nachname</td>
+            <td>Tel. Nr.</td>
+        </tr>
+    </thead>
+    <ul>
+        <div *ngFor="let contact of contacts">
+            <!--<span *ngIf="view === &quot;table&quot;">{{contacts.indexOf(contact) + 1}}</span>-->
+            <span>{{contact.firstName}}</span> <span>{{contact.lastName}}</span>{{view === "list" ? ":" : ""}} <span>{{contact.phone}}</span>
+        </div>
+    </ul>
+</table>

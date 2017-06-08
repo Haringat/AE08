@@ -3,17 +3,26 @@
     "module": "commonjs",
     "target": "es5",
     "sourceMap": true,
+    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": true,
-    "experimentalDecorators": true,
     "moduleResolution": "node",
     "noEmitHelpers": true,
     "importHelpers": true,
     "outDir": "dist",
-    "lib": ["es5", "es2015.promise", "es2015.generator", "es2015.iterable", "es2015.core", "es2015.symbol", "es2015.symbol.wellknown", "dom"]
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es5",
+      "es2015.promise",
+      "es2015.generator",
+      "es2015.iterable",
+      "es2015.core",
+      "es2015.symbol",
+      "es2015.symbol.wellknown",
+      "dom"]
   },
   "exclude": [
     "node_modules",
-    "frontend"
+    "frontend",
+    "dist"
   ]
 }

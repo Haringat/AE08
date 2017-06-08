@@ -10,11 +10,12 @@ export interface IStreet extends IModel {
 @Table({
     name: "streets"
 })
-export default class Street extends ModelTable implements IStreet {
+export default class Street extends ModelTable<IStreet> implements IStreet {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -31,7 +32,4 @@ export default class Street extends ModelTable implements IStreet {
     })
     public name: string;
 
-    constructor(model: IStreet) {
-        super(model);
-    }
 }

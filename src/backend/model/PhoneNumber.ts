@@ -11,11 +11,12 @@ export interface IPhoneNumber extends IModel {
 @Table({
     name: "phoneNumbers"
 })
-export default class PhoneNumber extends ModelTable implements IPhoneNumber {
+export default class PhoneNumber extends ModelTable<IPhoneNumber> implements IPhoneNumber {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -38,7 +39,4 @@ export default class PhoneNumber extends ModelTable implements IPhoneNumber {
     })
     public person: string;
 
-    constructor(model: IPhoneNumber) {
-        super(model);
-    }
 }

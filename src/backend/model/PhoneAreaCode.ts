@@ -10,7 +10,7 @@ export interface IPhoneAreaCode extends IModel {
 @Table({
     name: "phoneAreaCodes"
 })
-export default class PhoneAreaCode extends ModelTable implements IPhoneAreaCode {
+export default class PhoneAreaCode extends ModelTable<IPhoneAreaCode> implements IPhoneAreaCode {
 
     @Column({
         columnName: "uuid",
@@ -31,7 +31,4 @@ export default class PhoneAreaCode extends ModelTable implements IPhoneAreaCode 
     })
     public areaCode: string;
 
-    public constructor(model: IPhoneAreaCode) {
-        super(model);
-    }
 }

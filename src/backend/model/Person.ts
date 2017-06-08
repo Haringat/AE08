@@ -11,11 +11,12 @@ export interface IPerson extends IModel {
 @Table({
     name: "persons"
 })
-export default class Person extends ModelTable implements IPerson {
+export default class Person extends ModelTable<IPerson> implements IPerson {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -37,9 +38,5 @@ export default class Person extends ModelTable implements IPerson {
         type: DataType.UUID
     })
     public address: string;
-
-    public constructor(model: IPerson) {
-        super(model);
-    }
 
 }

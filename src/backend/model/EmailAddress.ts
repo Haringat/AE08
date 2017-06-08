@@ -10,11 +10,12 @@ export interface IEmailAddress extends IModel {
 @Table({
     name: "emailAddresses"
 })
-export default class EmailAddress extends ModelTable implements IEmailAddress {
+export default class EmailAddress extends ModelTable<IEmailAddress> implements IEmailAddress {
 
     @Column({
         columnName: "uuid",
-        type: DataType.UUID
+        type: DataType.UUID,
+        primaryKey: true
     })
     public uuid: string;
 
@@ -30,9 +31,5 @@ export default class EmailAddress extends ModelTable implements IEmailAddress {
         type: DataType.UUID
     })
     person: string;
-
-    constructor(model: IEmailAddress) {
-        super(model);
-    }
 
 }
